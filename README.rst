@@ -3,6 +3,26 @@ listdict
 
 .. contents::
 
+install
+-------
+
+At present, poetry is required to build this package. To get poetry,
+follow these instructions:
+
+https://poetry.eustace.io/docs/#installation
+
+Once you have poetry set up:
+
+.. code:: sh
+
+   $ git clone https://github.com/ubffm/listdict.git
+   $ cd listdict
+   $ poetry build
+   $ pip install dist/*.whl
+
+intro
+-----
+
 Many libraries use data formats in the MARC tradition. At the time of
 this writting, the Frankfurt Universtity Library uses Pica+, but this is
 also a MARC-style format, though the field names are entirely different.
@@ -274,3 +294,8 @@ method throws an error:
 
     MultipleValues: key '021A' has 2 values
 
+
+listdict.append
+---------------
+
+more later…

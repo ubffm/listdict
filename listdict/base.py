@@ -24,7 +24,7 @@ def addrow(dct: ListDict, row: t.Sequence):
     """add a row to a listdict recursively. The last item is the value,
     and the rest are keys.
     """
-    for i in range(len(row)-2):
+    for i in range(len(row) - 2):
         key = row[i]
         lst = dct.setdefault(key, [])
         dct = {}
