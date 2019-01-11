@@ -78,7 +78,7 @@ Say we have a recored like this (and we have):
 
 According to the above logic, it should be represented in like this:
 
-.. code:: ipython3
+.. code:: python
 
     record = {'002@': [{'0': ['Aauc']}],
      '003O': [{'0': ['180456939'], 'a': ['OCoLC']}],
@@ -124,7 +124,7 @@ You may rightly ask, "why do you need all those lists that only have one
 item? well, normally you don’t. However, sometimes the have more than
 one item. Them’s the breaks.
 
-.. code:: ipython3
+.. code:: python
 
     record["021A"]
 
@@ -155,7 +155,7 @@ depths.
 listdict.iter
 -------------
 
-.. code:: ipython3
+.. code:: python
 
     import listdict
     
@@ -177,7 +177,7 @@ listdict.iter
 As you see, each repeated field gets it’s own line. To flatten the data
 further, you could use two loops:
 
-.. code:: ipython3
+.. code:: python
 
     for fieldname, subfields in listdict.iter(record):
         for subfname, value in listdict.iter(subfields):
@@ -203,7 +203,7 @@ further, you could use two loops:
 However, this is such a normal pattern that it’s included in the
 ``iter`` function:
 
-.. code:: ipython3
+.. code:: python
 
     for subfield in listdict.iter(record, depth=1):
         print(subfield)
@@ -237,7 +237,7 @@ Because most of the lists in these data structures are only one item
 long, it may be useful to avoid dealing with the list if you already
 know that a certain key has only one value.
 
-.. code:: ipython3
+.. code:: python
 
     listdict.getone(record, "028A")
 
@@ -252,7 +252,7 @@ know that a certain key has only one value.
 
 This also supports arbitrary nesting.
 
-.. code:: ipython3
+.. code:: python
 
     listdict.getone(record, "028A", "8")
 
@@ -268,7 +268,7 @@ This also supports arbitrary nesting.
 However, any list on the way to the target has more than one item, this
 method throws an error:
 
-.. code:: ipython3
+.. code:: python
 
     listdict.getone(record, "021A")
 
