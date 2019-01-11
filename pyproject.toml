@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "listdict"
+version = "0.1.0"
+description = ""
+authors = ["Aaron Christianson <ninjaaron@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.1"
+jupyter = "^1.0"
+sqlalchemy = "^1.2"
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
