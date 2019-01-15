@@ -270,32 +270,135 @@ method throws an error:
 
 .. code:: python
 
-    listdict.getone(record, "021A")
+    try:
+        listdict.getone(record, "021A")
+    except listdict.MultipleValues as e:
+        print(e)
 
 
-::
+.. parsed-literal::
+
+    key '021A' has 2 values
 
 
-    ---------------------------------------------------------------------------
+listdict.mk
+-----------
 
-    MultipleValues                            Traceback (most recent call last)
+so we have some data that needs to be parsed into Python data
+structures. In this case, it will be a string or xml or whatever, but
+the pattern is the same either way.
 
-    <ipython-input-11-f6d1dc8c3a9f> in <module>
-    ----> 1 listdict.getone(record, "021A")
-    
+.. code:: python
 
-    ~/src/py/listdict/listdict/base.py in getone(dct, key, *subkeys)
-         73     """return one and only one value for a key in a dictionary of lists.
-         74     repeat on the value recusively for all subkeys
-    ---> 75     """
-         76     value = dct[key]
-         77     if len(value) != 1:
+    record = """\
+    021A ƒT01ƒULatnƒa@Mā anāšîm lô ʿôśîm bišvîl ahavāƒhIttî Nāwe
+    021A ƒT01ƒUHebrƒaמה אנשים לא עושים בשביל אהבהƒhאתי נוה
+    028A ƒ9162803451ƒ8Nāwe, Ittî [Tnx]
+    033A ƒpTēl-ĀvîvƒnʿEqed
+    034D ƒa48 S.
+    037A ƒaÜbers. d. Hauptsacht.: Was Menschen nicht für Liebe machen
+    046L ƒaIn hebr. Schr
+    046M ƒaGedichte
+    047A ƒrOriginalschrift durch autom. Retrokonversion
+    """
+    fields = []
+    for field in record.splitlines():
+        fieldname, _, subfields = field.partition(" ")
+        fields.append((
+            fieldname,
+            [(subf[0], subf[1:]) for subf in subfields.split("ƒ")[1:]]
+        ))
+    fields
 
 
-    MultipleValues: key '021A' has 2 values
 
 
-listdict.append
----------------
+.. parsed-literal::
 
-more later…
+    [('021A',
+      [('T', '01'),
+       ('U', 'Latn'),
+       ('a', '@Mā anāšîm lô ʿôśîm bišvîl ahavā'),
+       ('h', 'Ittî Nāwe')]),
+     ('021A',
+      [('T', '01'),
+       ('U', 'Hebr'),
+       ('a', 'מה אנשים לא עושים בשביל אהבה'),
+       ('h', 'אתי נוה')]),
+     ('028A', [('9', '162803451'), ('8', 'Nāwe, Ittî [Tnx]')]),
+     ('033A', [('p', 'Tēl-Āvîv'), ('n', 'ʿEqed')]),
+     ('034D', [('a', '48 S.')]),
+     ('037A',
+      [('a', 'Übers. d. Hauptsacht.: Was Menschen nicht für Liebe machen')]),
+     ('046L', [('a', 'In hebr. Schr')]),
+     ('046M', [('a', 'Gedichte')]),
+     ('047A', [('r', 'Originalschrift durch autom. Retrokonversion')])]
+
+
+
+So we’ve generated a datastructure like this
+``(fieldname, [(subname, content)])``; pairs where the first element is
+a field name and the second is the content. In this case, the content is
+a list of pairs of the same kind: subfield name and content, but the
+content is a string this time. We need this in a dictionary so we can
+have a lookup table. This isn’t too difficult, but ``listdict.mk`` makes
+it a little more straightforward:
+
+.. code:: python
+
+    record = listdict.mk(fields, depth=1)
+    record
+
+
+
+
+.. parsed-literal::
+
+    {'021A': [{'T': ['01'],
+       'U': ['Latn'],
+       'a': ['@Mā anāšîm lô ʿôśîm bišvîl ahavā'],
+       'h': ['Ittî Nāwe']},
+      {'T': ['01'],
+       'U': ['Hebr'],
+       'a': ['מה אנשים לא עושים בשביל אהבה'],
+       'h': ['אתי נוה']}],
+     '028A': [{'9': ['162803451'], '8': ['Nāwe, Ittî [Tnx]']}],
+     '033A': [{'p': ['Tēl-Āvîv'], 'n': ['ʿEqed']}],
+     '034D': [{'a': ['48 S.']}],
+     '037A': [{'a': ['Übers. d. Hauptsacht.: Was Menschen nicht für Liebe machen']}],
+     '046L': [{'a': ['In hebr. Schr']}],
+     '046M': [{'a': ['Gedichte']}],
+     '047A': [{'r': ['Originalschrift durch autom. Retrokonversion']}]}
+
+
+
+Basically, I wrote this library because I was sick of writting the same
+dictionary-building loops over and over again.
+
+listdict.iterpairs
+------------------
+
+You can also convert the dictionary back into pairs of the kind we saw
+at the beginning of the previous section.
+
+.. code:: python
+
+    for fieldname, content in listdict.iterpairs(record, depth=1):
+        content = "".join(
+            "ƒ{}{}".format(name, data) for name, data in content
+        )
+        print(fieldname, content)
+
+
+.. parsed-literal::
+
+    021A ƒT01ƒULatnƒa@Mā anāšîm lô ʿôśîm bišvîl ahavāƒhIttî Nāwe
+    021A ƒT01ƒUHebrƒaמה אנשים לא עושים בשביל אהבהƒhאתי נוה
+    028A ƒ9162803451ƒ8Nāwe, Ittî [Tnx]
+    033A ƒpTēl-ĀvîvƒnʿEqed
+    034D ƒa48 S.
+    037A ƒaÜbers. d. Hauptsacht.: Was Menschen nicht für Liebe machen
+    046L ƒaIn hebr. Schr
+    046M ƒaGedichte
+    047A ƒrOriginalschrift durch autom. Retrokonversion
+
