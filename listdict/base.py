@@ -20,35 +20,15 @@ def append(dct: ListDict, key, value):
     dct.setdefault(key, []).append(value)
 
 
-def addrow(dct: ListDict, row: t.Sequence):
-    """add a row to a listdict recursively. The last item is the value,
-    and the rest are keys.
-    """
-    for i in range(len(row) - 2):
-        key = row[i]
-        lst = dct.setdefault(key, [])
-        dct = {}
-        lst.append(dct)
-    dct.setdefault(row[-2], []).append(row[-1])
-
-
-def fromrows(rows: t.Iterable[t.Sequence]):
-    """creates a listdict from rows using listdict.addrow"""
-    dct = {}
-    for row in rows:
-        addrow(dct, row)
-    return dct
-
-
-def mk(pairs: t.Iterable[Pair], recurse=0) -> ListDict:
+def mk(pairs: t.Iterable[Pair], depth=0) -> ListDict:
     """take an iterable of key-value pairs and construct a dictionary
     of lists of the values. calls itself recursively on the values
     ``recurse`` number of times.
     """
     dct = {}
     for key, value in pairs:
-        if recurse > 0:
-            value = mk(value, recurse - 1)
+        if depth > 0:
+            value = mk(value, depth - 1)
         append(dct, key, value)
     return dct
 
@@ -67,6 +47,18 @@ def iter(dct: ListDict, depth=0):
                     yield key, value
             else:
                 yield key, value
+
+
+def iterpairs(dct: ListDict, depth=0):
+    for key, values in dct.items():
+        for value in values:
+            if depth > 0:
+                try:
+                    yield (key, list(iterpairs(value, depth - 1)))
+                except AttributeError:
+                    yield key, value
+            else:
+                yield (key, value)
 
 
 def getone(dct: ListDict, key, *subkeys):
