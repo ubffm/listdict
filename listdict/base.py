@@ -20,15 +20,15 @@ def append(dct: ListDict, key, value):
     dct.setdefault(key, []).append(value)
 
 
-def mk(pairs: t.Iterable[Pair], depth=0) -> ListDict:
+def mk(data: t.Iterable, *parsers, idx=0) -> ListDict:
     """take an iterable of key-value pairs and construct a dictionary
     of lists of the values. calls itself recursively on the values
     ``recurse`` number of times.
     """
     dct = {}
-    for key, value in pairs:
-        if depth > 0:
-            value = mk(value, depth - 1)
+    for key, value in map(parsers[idx], data):
+        if idx < len(parsers) - 1:
+            value = mk(value, *parsers, idx=idx + 1)
         append(dct, key, value)
     return dct
 

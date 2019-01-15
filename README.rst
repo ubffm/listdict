@@ -273,20 +273,26 @@ method throws an error:
     try:
         listdict.getone(record, "021A")
     except listdict.MultipleValues as e:
-        print(e)
+        print(e.__class__.__name__, e)
 
 
 .. parsed-literal::
 
-    key '021A' has 2 values
+    MultipleValues key '021A' has 2 values
 
 
-listdict.mk
------------
+listdict.append
+---------------
 
-so we have some data that needs to be parsed into Python data
-structures. In this case, it will be a string or xml or whatever, but
-the pattern is the same either way.
+listdict.append is just a wrapper on
+
+.. code:: python
+
+   dictionary.setdefault(key, []).append(value)
+
+I just found the code was cleaner if I didn’t have to keep writing it
+over and over. This example is with parsing a string, but the pattern
+would be similar with XML or whatever.
 
 .. code:: python
 
@@ -301,13 +307,14 @@ the pattern is the same either way.
     046M ƒaGedichte
     047A ƒrOriginalschrift durch autom. Retrokonversion
     """
-    fields = []
+    
+    fields = {}
     for field in record.splitlines():
         fieldname, _, subfields = field.partition(" ")
-        fields.append((
-            fieldname,
-            [(subf[0], subf[1:]) for subf in subfields.split("ƒ")[1:]]
-        ))
+        subdict = {}
+        for subfield in subfields.split("ƒ")[1:]:
+            listdict.append(subdict, subfield[0], subfield[1:])
+        listdict.append(fields, fieldname, subdict)
     fields
 
 
@@ -315,38 +322,44 @@ the pattern is the same either way.
 
 .. parsed-literal::
 
-    [('021A',
-      [('T', '01'),
-       ('U', 'Latn'),
-       ('a', '@Mā anāšîm lô ʿôśîm bišvîl ahavā'),
-       ('h', 'Ittî Nāwe')]),
-     ('021A',
-      [('T', '01'),
-       ('U', 'Hebr'),
-       ('a', 'מה אנשים לא עושים בשביל אהבה'),
-       ('h', 'אתי נוה')]),
-     ('028A', [('9', '162803451'), ('8', 'Nāwe, Ittî [Tnx]')]),
-     ('033A', [('p', 'Tēl-Āvîv'), ('n', 'ʿEqed')]),
-     ('034D', [('a', '48 S.')]),
-     ('037A',
-      [('a', 'Übers. d. Hauptsacht.: Was Menschen nicht für Liebe machen')]),
-     ('046L', [('a', 'In hebr. Schr')]),
-     ('046M', [('a', 'Gedichte')]),
-     ('047A', [('r', 'Originalschrift durch autom. Retrokonversion')])]
+    {'021A': [{'T': ['01'],
+       'U': ['Latn'],
+       'a': ['@Mā anāšîm lô ʿôśîm bišvîl ahavā'],
+       'h': ['Ittî Nāwe']},
+      {'T': ['01'],
+       'U': ['Hebr'],
+       'a': ['מה אנשים לא עושים בשביל אהבה'],
+       'h': ['אתי נוה']}],
+     '028A': [{'9': ['162803451'], '8': ['Nāwe, Ittî [Tnx]']}],
+     '033A': [{'p': ['Tēl-Āvîv'], 'n': ['ʿEqed']}],
+     '034D': [{'a': ['48 S.']}],
+     '037A': [{'a': ['Übers. d. Hauptsacht.: Was Menschen nicht für Liebe machen']}],
+     '046L': [{'a': ['In hebr. Schr']}],
+     '046M': [{'a': ['Gedichte']}],
+     '047A': [{'r': ['Originalschrift durch autom. Retrokonversion']}]}
 
 
 
-So we’ve generated a datastructure like this
-``(fieldname, [(subname, content)])``; pairs where the first element is
-a field name and the second is the content. In this case, the content is
-a list of pairs of the same kind: subfield name and content, but the
-content is a string this time. We need this in a dictionary so we can
-have a lookup table. This isn’t too difficult, but ``listdict.mk`` makes
-it a little more straightforward:
+listdict.mk
+-----------
+
+An alternative, arguably cleaner way to do this is to use
+``listdict.mk``, which takes an iterable of fields and any number of
+``*parsers``. Each parser will take field and return a pair containing
+the field’s name and the fields content. If there are subfields, the
+parser should return an iterable of subfields for the second item in the
+pair, and each item will be passed along to the next parser.
 
 .. code:: python
 
-    record = listdict.mk(fields, depth=1)
+    def fieldsplit(field):
+        fieldname, _, content = field.partition(" ")
+        return (fieldname, content.split("ƒ")[1:])
+    
+    def subfieldsplit(subfield):
+        return subfield[0], subfield[1:]
+    
+    record = listdict.mk(record.splitlines(), fieldsplit, subfieldsplit)
     record
 
 
@@ -372,33 +385,121 @@ it a little more straightforward:
 
 
 
-Basically, I wrote this library because I was sick of writting the same
-dictionary-building loops over and over again.
-
-listdict.iterpairs
-------------------
-
-You can also convert the dictionary back into pairs of the kind we saw
-at the beginning of the previous section.
+Here, the first parser makes a pair containing the fields name and a
+list of subfields:
 
 .. code:: python
 
-    for fieldname, content in listdict.iterpairs(record, depth=1):
-        content = "".join(
-            "ƒ{}{}".format(name, data) for name, data in content
-        )
-        print(fieldname, content)
+    fieldsplit("021A ƒT01ƒUHebrƒaמה אנשים לא עושים בשביל אהבהƒhאתי נוה")
+
+
 
 
 .. parsed-literal::
 
-    021A ƒT01ƒULatnƒa@Mā anāšîm lô ʿôśîm bišvîl ahavāƒhIttî Nāwe
-    021A ƒT01ƒUHebrƒaמה אנשים לא עושים בשביל אהבהƒhאתי נוה
-    028A ƒ9162803451ƒ8Nāwe, Ittî [Tnx]
-    033A ƒpTēl-ĀvîvƒnʿEqed
-    034D ƒa48 S.
-    037A ƒaÜbers. d. Hauptsacht.: Was Menschen nicht für Liebe machen
-    046L ƒaIn hebr. Schr
-    046M ƒaGedichte
-    047A ƒrOriginalschrift durch autom. Retrokonversion
+    ('021A', ['T01', 'UHebr', 'aמה אנשים לא עושים בשביל אהבה', 'hאתי נוה'])
+
+
+
+Each subfield needs to have the first letter split off as the key and
+rest of the string as the value:
+
+.. code:: python
+
+    subfieldsplit('aמה אנשים לא עושים בשביל אהבה')
+
+
+
+
+.. parsed-literal::
+
+    ('a', 'מה אנשים לא עושים בשביל אהבה')
+
+
+
+Basically, I wrote this library because I was sick of writting the same
+dictionary-building loops over and over again.
+
+let’s do an MARC21 XML example:
+
+.. code:: python
+
+    # use lxml in real life, not the bundled xml module
+    from xml.etree import ElementTree as etree
+    xml = etree.fromstring("""
+    <record>
+      <datafield tag="100" ind1="0" ind2=" ">
+        <subfield code="a">יחיא בן יוסף</subfield>
+        <subfield code="9">heb</subfield>
+      </datafield>
+      <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">פרוש כתובים ליחיא בן יוסף :</subfield>
+        <subfield code="b">דפוס 1538.</subfield>
+      </datafield>
+      <datafield tag="581" ind1=" " ind2=" ">
+        <subfield code="a">Biscioni, Antonio Maria, ed., Bibliothecae Ebraicae Graecae Florentinae sive Bibliothecae Mediceo Laurentianae, Florentiae, 1757, vol. 2.</subfield>
+      </datafield>
+      <datafield tag="590" ind1=" " ind2=" ">
+        <subfield code="a">בר רב</subfield>
+      </datafield>
+      <datafield tag="539" ind1="1" ind2=" ">
+        <subfield code="a">פירנצה - לורנציאנה 48.PLUT.I</subfield>
+      </datafield>
+      <datafield tag="539" ind1="1" ind2=" ">
+        <subfield code="a">Firenze - Biblioteca Medicea Laurenziana Plut.I.48</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">נושא ישן: מקרא פרשנות כתובים (יחיא בן יוסף)</subfield>
+      </datafield>
+    </record>
+    """)
+
+To generate the required dictionary, this is all the code we need:
+
+.. code:: python
+
+    listdict.mk(
+        xml.iter("datafield"), 
+        lambda field: (field.attrib["tag"], field.iter("subfield")),
+        lambda subfield: (subfield.attrib["code"], subfield.text)
+    )
+
+
+
+
+.. parsed-literal::
+
+    {'100': [{'a': ['יחיא בן יוסף'], '9': ['heb']}],
+     '245': [{'a': ['פרוש כתובים ליחיא בן יוסף :'], 'b': ['דפוס 1538.']}],
+     '581': [{'a': ['Biscioni, Antonio Maria, ed., Bibliothecae Ebraicae Graecae Florentinae sive Bibliothecae Mediceo Laurentianae, Florentiae, 1757, vol. 2.']}],
+     '590': [{'a': ['בר רב']}],
+     '539': [{'a': ['פירנצה - לורנציאנה 48.PLUT.I']},
+      {'a': ['Firenze - Biblioteca Medicea Laurenziana Plut.I.48']}],
+     '500': [{'a': ['נושא ישן: מקרא פרשנות כתובים (יחיא בן יוסף)']}]}
+
+
+
+listdict.iterpairs
+------------------
+
+You can also convert the dictionary back into the kinds of pairs which
+the parse functions generate
+
+.. code:: python
+
+    for pair in listdict.iterpairs(record, depth=1):
+        print(pair)
+
+
+.. parsed-literal::
+
+    ('021A', [('T', '01'), ('U', 'Latn'), ('a', '@Mā anāšîm lô ʿôśîm bišvîl ahavā'), ('h', 'Ittî Nāwe')])
+    ('021A', [('T', '01'), ('U', 'Hebr'), ('a', 'מה אנשים לא עושים בשביל אהבה'), ('h', 'אתי נוה')])
+    ('028A', [('9', '162803451'), ('8', 'Nāwe, Ittî [Tnx]')])
+    ('033A', [('p', 'Tēl-Āvîv'), ('n', 'ʿEqed')])
+    ('034D', [('a', '48 S.')])
+    ('037A', [('a', 'Übers. d. Hauptsacht.: Was Menschen nicht für Liebe machen')])
+    ('046L', [('a', 'In hebr. Schr')])
+    ('046M', [('a', 'Gedichte')])
+    ('047A', [('r', 'Originalschrift durch autom. Retrokonversion')])
 
