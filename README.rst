@@ -23,6 +23,73 @@ Once you have poetry set up:
 intro
 -----
 
+Here’s the elevator pitch: Say you have a marcxml record:
+
+.. code:: python
+
+    # use lxml in real life, not the bundled xml module
+    from xml.etree import ElementTree as etree
+    xml = etree.fromstring("""
+    <record>
+      <datafield tag="100" ind1="0" ind2=" ">
+        <subfield code="a">יחיא בן יוסף</subfield>
+        <subfield code="9">heb</subfield>
+      </datafield>
+      <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">פרוש כתובים ליחיא בן יוסף :</subfield>
+        <subfield code="b">דפוס 1538.</subfield>
+      </datafield>
+      <datafield tag="581" ind1=" " ind2=" ">
+        <subfield code="a">Biscioni, Antonio Maria, ed., Bibliothecae Ebraicae Graecae Florentinae sive Bibliothecae Mediceo Laurentianae, Florentiae, 1757, vol. 2.</subfield>
+      </datafield>
+      <datafield tag="590" ind1=" " ind2=" ">
+        <subfield code="a">בר רב</subfield>
+      </datafield>
+      <datafield tag="539" ind1="1" ind2=" ">
+        <subfield code="a">פירנצה - לורנציאנה 48.PLUT.I</subfield>
+      </datafield>
+      <datafield tag="539" ind1="1" ind2=" ">
+        <subfield code="a">Firenze - Biblioteca Medicea Laurenziana Plut.I.48</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">נושא ישן: מקרא פרשנות כתובים (יחיא בן יוסף)</subfield>
+      </datafield>
+    </record>
+    """)
+
+Listdict provides a simple way to parse this into dictionaries of lists
+of dictionaries of lists:
+
+.. code:: python
+
+    import listdict
+    listdict.mk(
+        xml.iter("datafield"), 
+        lambda field: (field.attrib["tag"], field.iter("subfield")),
+        lambda subfield: (subfield.attrib["code"], subfield.text)
+    )
+
+
+
+
+.. parsed-literal::
+
+    {'100': [{'a': ['יחיא בן יוסף'], '9': ['heb']}],
+     '245': [{'a': ['פרוש כתובים ליחיא בן יוסף :'], 'b': ['דפוס 1538.']}],
+     '581': [{'a': ['Biscioni, Antonio Maria, ed., Bibliothecae Ebraicae Graecae Florentinae sive Bibliothecae Mediceo Laurentianae, Florentiae, 1757, vol. 2.']}],
+     '590': [{'a': ['בר רב']}],
+     '539': [{'a': ['פירנצה - לורנציאנה 48.PLUT.I']},
+      {'a': ['Firenze - Biblioteca Medicea Laurenziana Plut.I.48']}],
+     '500': [{'a': ['נושא ישן: מקרא פרשנות כתובים (יחיא בן יוסף)']}]}
+
+
+
+Basically, you’re giving it an iterable things that need to be put into
+the dictionary, and then defining a mini-parser for each depth level.
+More details in the documentation of ``listdict.mk``.
+
+Here’s the long pitch:
+
 Many libraries use data formats in the MARC tradition. At the time of
 this writting, the Frankfurt Universtity Library uses Pica+, but this is
 also a MARC-style format, though the field names are entirely different.
@@ -39,9 +106,6 @@ Python.
 The consensus (in our office) is that the way to deal with this in
 Python is using a dictionary of lists of dictionaries of lists of
 values.
-
-That is, the record is a dictionary of lists of fields, and each field
-is a dictionary of lists of subfields.
 
 Say we have a recored like this (and we have):
 
@@ -157,8 +221,6 @@ listdict.iter
 
 .. code:: python
 
-    import listdict
-    
     # lets deal with fewer fields
     record = {key: record[key] for key in ("003O", "021A", "028A")}
     
