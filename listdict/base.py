@@ -20,6 +20,11 @@ def append(dct: ListDict, key, value):
     dct.setdefault(key, []).append(value)
 
 
+def extend(dct: ListDict, key, values):
+    for value in values:
+        append(dct, key, value)
+
+
 def mk(data: t.Iterable, *parsers, idx=0) -> ListDict:
     """take an iterable of key-value pairs and construct a dictionary
     of lists of the values. calls itself recursively on the values
