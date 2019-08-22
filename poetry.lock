@@ -23,11 +23,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "19.1.0"
 
-[package.extras]
-dev = ["coverage", "hypothesis", "pympler", "pytest", "six", "zope.interface", "sphinx", "pre-commit"]
-docs = ["sphinx", "zope.interface"]
-tests = ["coverage", "hypothesis", "pympler", "pytest", "six", "zope.interface"]
-
 [[package]]
 category = "dev"
 description = "Specifications for callback functions passed in to an API"
@@ -92,10 +87,6 @@ version = "0.19"
 [package.dependencies]
 zipp = ">=0.5"
 
-[package.extras]
-docs = ["sphinx", "rst.linker"]
-testing = ["importlib-resources"]
-
 [[package]]
 category = "dev"
 description = "IPython Kernel for Jupyter"
@@ -109,9 +100,6 @@ ipython = ">=5.0.0"
 jupyter-client = "*"
 tornado = ">=4.2"
 traitlets = ">=4.1.0"
-
-[package.extras]
-test = ["pytest", "pytest-cov", "nose"]
 
 [[package]]
 category = "dev"
@@ -137,17 +125,6 @@ traitlets = ">=4.2"
 [package.dependencies.win-unicode-console]
 python = "<3.6"
 version = ">=0.5"
-
-[package.extras]
-all = ["notebook", "ipywidgets", "numpy", "ipykernel", "qtconsole", "nbformat", "nbconvert", "ipyparallel", "nose (>=0.10.1)", "testpath", "pygments", "Sphinx (>=1.3)", "requests"]
-doc = ["Sphinx (>=1.3)"]
-kernel = ["ipykernel"]
-nbconvert = ["nbconvert"]
-nbformat = ["nbformat"]
-notebook = ["notebook", "ipywidgets"]
-parallel = ["ipyparallel"]
-qtconsole = ["qtconsole"]
-test = ["nose (>=0.10.1)", "requests", "testpath", "pygments", "nbformat", "ipykernel", "numpy"]
 
 [[package]]
 category = "dev"
@@ -175,9 +152,6 @@ widgetsnbextension = ">=3.5.0,<3.6.0"
 python = ">=3.3"
 version = ">=4.0.0"
 
-[package.extras]
-test = ["pytest (>=3.6.0)", "pytest-cov", "mock"]
-
 [[package]]
 category = "dev"
 description = "An autocompletion tool for Python that can be used for text editors."
@@ -189,9 +163,6 @@ version = "0.15.1"
 [package.dependencies]
 parso = ">=0.5.0"
 
-[package.extras]
-testing = ["colorama", "docopt", "pytest (>=3.1.0,<5.0.0)"]
-
 [[package]]
 category = "dev"
 description = "A small but fast and easy to use stand-alone template engine written in pure python."
@@ -202,9 +173,6 @@ version = "2.10.1"
 
 [package.dependencies]
 MarkupSafe = ">=0.23"
-
-[package.extras]
-i18n = ["Babel (>=0.8)"]
 
 [[package]]
 category = "dev"
@@ -219,9 +187,6 @@ attrs = ">=17.4.0"
 pyrsistent = ">=0.14.0"
 setuptools = "*"
 six = ">=1.11.0"
-
-[package.extras]
-format = ["idna", "jsonpointer (>1.13)", "rfc3987", "strict-rfc3339", "webcolors"]
 
 [[package]]
 category = "dev"
@@ -254,9 +219,6 @@ pyzmq = ">=13"
 tornado = ">=4.1"
 traitlets = "*"
 
-[package.extras]
-test = ["ipykernel", "ipython", "mock", "pytest"]
-
 [[package]]
 category = "dev"
 description = "Jupyter terminal console"
@@ -271,9 +233,6 @@ ipython = "*"
 jupyter-client = "*"
 prompt-toolkit = ">=2.0.0,<2.1.0"
 pygments = "*"
-
-[package.extras]
-test = ["pexpect"]
 
 [[package]]
 category = "dev"
@@ -332,13 +291,6 @@ pygments = "*"
 testpath = "*"
 traitlets = ">=4.2"
 
-[package.extras]
-all = ["pytest", "pytest-cov", "ipykernel", "jupyter-client (>=5.3.1)", "ipywidgets (>=7)", "pebble", "tornado (>=4.0)", "sphinx (>=1.5.1)", "sphinx-rtd-theme", "nbsphinx (>=0.2.12)", "sphinxcontrib-github-alt", "ipython", "mock"]
-docs = ["sphinx (>=1.5.1)", "sphinx-rtd-theme", "nbsphinx (>=0.2.12)", "sphinxcontrib-github-alt", "ipython", "jupyter-client (>=5.3.1)"]
-execute = ["jupyter-client (>=5.3.1)"]
-serve = ["tornado (>=4.0)"]
-test = ["pytest", "pytest-cov", "ipykernel", "jupyter-client (>=5.3.1)", "ipywidgets (>=7)", "pebble", "mock"]
-
 [[package]]
 category = "dev"
 description = "The Jupyter Notebook format"
@@ -353,16 +305,13 @@ jsonschema = ">=2.4,<2.5.0 || >2.5.0"
 jupyter-core = "*"
 traitlets = ">=4.1"
 
-[package.extras]
-test = ["pytest", "pytest-cov", "testpath"]
-
 [[package]]
 category = "dev"
 description = "A web-based notebook environment for interactive computing"
 name = "notebook"
 optional = false
 python-versions = ">=3.5"
-version = "6.0.0"
+version = "6.0.1"
 
 [package.dependencies]
 Send2Trash = "*"
@@ -378,9 +327,6 @@ pyzmq = ">=17"
 terminado = ">=0.8.1"
 tornado = ">=5.0"
 traitlets = ">=4.2.1"
-
-[package.extras]
-test = ["nose", "coverage", "requests", "nose-warnings-filters", "nbval", "nose-exclude", "selenium", "pytest", "pytest-cov", "mock", "nose-exclude"]
 
 [[package]]
 category = "dev"
@@ -410,9 +356,6 @@ name = "parso"
 optional = false
 python-versions = "*"
 version = "0.5.1"
-
-[package.extras]
-testing = ["docopt", "pytest (>=3.0.7)"]
 
 [[package]]
 category = "dev"
@@ -457,9 +400,6 @@ version = "0.12.0"
 [package.dependencies]
 importlib-metadata = ">=0.12"
 
-[package.extras]
-dev = ["pre-commit", "tox"]
-
 [[package]]
 category = "dev"
 description = "Python client for the Prometheus monitoring system."
@@ -467,9 +407,6 @@ name = "prometheus-client"
 optional = false
 python-versions = "*"
 version = "0.7.1"
-
-[package.extras]
-twisted = ["twisted"]
 
 [[package]]
 category = "dev"
@@ -554,9 +491,6 @@ version = ">=4.0.0"
 python = "<3.6"
 version = ">=2.2.0"
 
-[package.extras]
-testing = ["argcomplete", "hypothesis (>=3.56)", "nose", "requests", "mock"]
-
 [[package]]
 category = "dev"
 description = "Extensions to the standard Python datetime module"
@@ -601,10 +535,6 @@ jupyter-core = "*"
 pygments = "*"
 traitlets = "*"
 
-[package.extras]
-doc = ["Sphinx (>=1.3)"]
-test = ["pytest", "mock"]
-
 [[package]]
 category = "dev"
 description = "Send file to trash natively under Mac OS X, Windows and Linux."
@@ -642,9 +572,6 @@ optional = false
 python-versions = "*"
 version = "0.4.2"
 
-[package.extras]
-test = ["pathlib2"]
-
 [[package]]
 category = "dev"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
@@ -665,9 +592,6 @@ version = "4.3.2"
 decorator = "*"
 ipython-genutils = "*"
 six = "*"
-
-[package.extras]
-test = ["pytest", "mock"]
 
 [[package]]
 category = "dev"
@@ -713,10 +637,6 @@ optional = false
 python-versions = ">=2.7"
 version = "0.5.2"
 
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pathlib2", "contextlib2", "unittest2"]
-
 [metadata]
 content-hash = "72c3eb2707e10848a6f5f3779bfb3b97e556afbd1f9fbb38cb04f95d4d5e2f77"
 python-versions = "^3.5"
@@ -748,7 +668,7 @@ mistune = ["59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e", "
 more-itertools = ["409cd48d4db7052af495b09dec721011634af3753ae1ef92d2b32f73a745f832", "92b8c4b06dac4f0611c0729b2f2ede52b2e1bac1ab48f089c7ddc12e26bb60c4"]
 nbconvert = ["427a468ec26e7d68a529b95f578d5cbf018cb4c1f889e897681c2b6d11897695", "48d3c342057a2cf21e8df820d49ff27ab9f25fc72b8f15606bd47967333b2709"]
 nbformat = ["b9a0dbdbd45bb034f4f8893cafd6f652ea08c8c1674ba83f2dc55d3955743b0b", "f7494ef0df60766b7cabe0a3651556345a963b74dbc16bc7c18479041170d402"]
-notebook = ["0be97e939cec73cde37fc4d2a606a6f497a9addf3afcf61a09a21b0c35e699c5", "5c16dbf4fa824db19de43637ebfb24bcbd3b4f646e5d6a0414ed3a376d6bc951"]
+notebook = ["660976fe4fe45c7aa55e04bf4bccb9f9566749ff637e9020af3422f9921f9a5d", "b0a290f5cc7792d50a21bec62b3c221dd820bf00efa916ce9aeec4b5354bde20"]
 packaging = ["a7ac867b97fdc07ee80a8058fe4435ccd274ecc3b0ed61d852d7d53055528cf9", "c491ca87294da7cc01902edbe30a5bc6c4c28172b5138ab4e4aa1b9d7bfaeafe"]
 pandocfilters = ["b3dd70e169bb5449e6bc6ff96aea89c5eea8c5f6ab5e207fc2f521a2cf4a0da9"]
 parso = ["63854233e1fadb5da97f2744b6b24346d2750b85965e7e399bec1620232797dc", "666b0ee4a7a1220f65d367617f2cd3ffddff3e205f3f16a0284df30e774c2a9c"]
