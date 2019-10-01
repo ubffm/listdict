@@ -56,7 +56,7 @@ def iter(dct: ListDict[K, t.Any], depth=0) -> t.Iterator[tuple]:
                 yield key, value
 
 
-def iterpairs(dct: ListDict, depth=0):
+def iterpairs(dct: ListDict[K, t.Any], depth=0) -> t.Iterator[t.Tuple[K, t.Any]]:
     for key, values in dct.items():
         for value in values:
             if depth > 0:
@@ -68,7 +68,7 @@ def iterpairs(dct: ListDict, depth=0):
                 yield (key, value)
 
 
-def getone(dct: ListDict, key, *subkeys):
+def getone(dct: ListDict[K, t.Any], key: K, *subkeys):
     """return one and only one value for a key in a dictionary of lists.
     repeat on the value recusively for all subkeys
     """
