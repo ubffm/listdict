@@ -6,31 +6,33 @@ import typing as t
 __ALL__ = ["Pair", "ListDict", "append", "mk", "iter", "getone"]
 
 Pair = t.Tuple[t.Any, t.Any]
-ListDict = t.Dict[t.Any, t.MutableSequence]
+K = t.TypeVar("K")
+V = t.TypeVar("V")
+ListDict = t.Dict[K, t.MutableSequence[V]]
 
 
 class MultipleValues(Exception):
     pass
 
 
-def append(dct: ListDict, key, value):
+def append(dct: ListDict[K, V], key: K, value: V):
     """you have a dictionary of lists. append a value to the list of
     key.
     """
     dct.setdefault(key, []).append(value)
 
 
-def extend(dct: ListDict, key, values):
+def extend(dct: ListDict[K, V], key: K, values: t.Iterable[V]):
     for value in values:
         append(dct, key, value)
 
 
-def mk(data: t.Iterable, *parsers, idx=0) -> ListDict:
+def mk(data: t.Iterable[t.Tuple[K, t.Any]], *parsers, idx=0) -> ListDict[K, t.Any]:
     """take an iterable of key-value pairs and construct a dictionary
     of lists of the values. calls itself recursively on the values
     ``recurse`` number of times.
     """
-    dct = {}
+    dct = {}  # type: ListDict[K, t.Any]
     for key, value in map(parsers[idx], data):
         if idx < len(parsers) - 1:
             value = mk(value, *parsers, idx=idx + 1)
@@ -38,10 +40,10 @@ def mk(data: t.Iterable, *parsers, idx=0) -> ListDict:
     return dct
 
 
-def iter(dct: ListDict, depth=0):
+def iter(dct: ListDict[K, t.Any], depth=0) -> t.Iterator[tuple]:
     """you have a dictionary of lists. Get tuples of key and value for
     each value in each list. values will be recursively unpacked as ListDicts
-    ``recurse`` number of times.
+    ``depth`` number of times.
     """
     for key, values in dct.items():
         for value in values:
